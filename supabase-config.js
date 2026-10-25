@@ -1,0 +1,5 @@
+window.SIMPLETASK_SUPABASE_URL =
+  "https://zpymkpckhxhqzdxzjyjz.supabase.co";
+
+window.SIMPLETASK_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpweW1rcGNraHhocXpkeHpqeWp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4MjU2NjUsImV4cCI6MjEwODQwMTY2NX0.J05UixY-wJhKl_vnYauKpbwyRQMAVnXim0hpClLTWQY";

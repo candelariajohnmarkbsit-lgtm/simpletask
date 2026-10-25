@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1c1f22">
+  <meta name="description" content="SimpleTask: a student-focused task and time management app.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <title>SimpleTask | Login and Register</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body">
+  <main class="auth-shell">
+    <aside class="brand-panel">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><img src="icons/plmun-logo.png" alt=""></div>
+        <div class="brand-name">Simple<span>Task</span></div>
+        <p class="tagline">Plan today. Achieve tomorrow.</p>
+      </div>
+
+      <div class="brand-copy">
+        <p>A smart student-focused PWA for task and time management.</p>
+      </div>
+
+      <div class="illustration" aria-hidden="true">
+        <div class="floating-card checklist">
+          <span class="tiny-check">✓</span><span class="line"></span>
+          <span class="tiny-check">✓</span><span class="line short"></span>
+        </div>
+        <div class="floating-card calendar">
+          <div class="calendar-top"></div>
+          <div class="calendar-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="student">
+          <div class="hair"></div><div class="face"><span class="eye left"></span><span class="eye right"></span><span class="smile"></span></div>
+          <div class="neck"></div><div class="body"></div>
+          <div class="laptop"><div class="laptop-dot"></div></div>
+        </div>
+        <div class="books"><span></span><span></span><span></span></div>
+        <div class="plant"><i></i><i></i><i></i><b></b></div>
+        <div class="ground"></div>
+      </div>
+      <div class="wave wave-one"></div>
+      <div class="wave wave-two"></div>
+    </aside>
+
+    <section class="form-panel">
+      <form id="loginForm" class="auth-form">
+        <h1>Welcome Back!</h1>
+        <p class="form-intro">Log in to your account and continue managing your tasks.</p>
+
+        <label for="loginEmail">Email Address</label>
+        <div class="input-wrap"><span class="field-icon">✉</span><input id="loginEmail" type="email" placeholder="Enter your email" autocomplete="email" required></div>
+
+        <label for="loginPassword">Password</label>
+        <div class="input-wrap"><span class="field-icon">▣</span><input id="loginPassword" type="password" placeholder="Enter your password" autocomplete="current-password" required><button class="show-password" type="button" data-target="loginPassword" aria-label="Show password">◉</button></div>
+
+        <div class="form-options"><label class="remember"><input type="checkbox" id="rememberMe" checked> Remember me</label><button type="button" class="text-button" id="forgotPassword">Forgot password?</button></div>
+        <button class="primary-button" type="submit">Log In</button>
+        <div class="divider"><span></span>OR<span></span></div>
+        <button class="google-button" type="button" id="googleLogin"><span class="google-g">G</span> Continue with Google</button>
+        <p class="switch-prompt">Don't have an account? <button type="button" class="text-button" data-switch="register">Register</button></p>
+        <p class="message" id="loginMessage" role="status"></p>
+      </form>
+
+      <form id="registerForm" class="auth-form hidden">
+        <h1>Create Your Account</h1>
+        <p class="form-intro">Get started with SimpleTask and manage your tasks, schedules, and deadlines.</p>
+
+        <label for="fullName">Full Name</label>
+        <div class="input-wrap"><span class="field-icon">♙</span><input id="fullName" type="text" placeholder="Enter your full name" autocomplete="name" required></div>
+
+        <label for="registerEmail">Email Address</label>
+        <div class="input-wrap"><span class="field-icon">✉</span><input id="registerEmail" type="email" placeholder="Enter your email" autocomplete="email" required></div>
+
+        <label for="registerPassword">Password</label>
+        <div class="input-wrap"><span class="field-icon">▣</span><input id="registerPassword" type="password" placeholder="Create a password (8+ characters)" autocomplete="new-password" minlength="8" required><button class="show-password" type="button" data-target="registerPassword" aria-label="Show password">◉</button></div>
+
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="input-wrap"><span class="field-icon">▣</span><input id="confirmPassword" type="password" placeholder="Confirm your password" autocomplete="new-password" minlength="8" required><button class="show-password" type="button" data-target="confirmPassword" aria-label="Show password">◉</button></div>
+
+        <button class="primary-button register-button" type="submit">Register</button>
+        <div class="divider"><span></span>OR<span></span></div>
+        <button class="google-button" type="button" id="googleRegister"><span class="google-g">G</span> Continue with Google</button>
+        <p class="switch-prompt">Already have an account? <button type="button" class="text-button" data-switch="login">Log in</button></p>
+        <p class="message" id="registerMessage" role="status"></p>
+      </form>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="pwa.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

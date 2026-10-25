@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1c1f22">
+  <title>SimpleTask | Dashboard & Calendar</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <!-- Tailwind CSS (utility classes). Preflight is off so it does not override style.css -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>if (window.tailwind) { tailwind.config = { corePlugins: { preflight: false } }; }</script>
+  <!-- EmailJS Browser SDK CDN -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-in">
+      <a class="brand-logo" href="dashboard.html" aria-label="SimpleTask home">
+        <img src="icons/plmun-logo.png" alt="PLMun logo">
+        <span class="topbar-sub"><b>Simple<span>Task</span></b><small>Pamantasan ng Lungsod ng Muntinlupa</small></span>
+      </a>
+      <span class="topbar-badge">Student Task &amp; Time Manager</span>
+    </div>
+  </header>
+
+  <nav class="subnav" aria-label="Main menu">
+    <div class="subnav-in">
+      <span class="nav-item nav-home" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg></span>
+      <button id="installBtn" class="nav-item notify-btn hidden" type="button">⬇ Install app</button>
+      <button id="settingsBtn" class="nav-item notify-btn" type="button">⚙ Reminder settings</button>
+      <button id="enableNotifyBtn" class="nav-item notify-btn" type="button">🔔 Enable alerts</button>
+      <button id="logoutBtn" class="logout-btn" type="button">Log Out</button>
+    </div>
+  </nav>
+
+  <div class="dashboard-wrapper">
+    <!-- Page header -->
+    <section class="page-header">
+      <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>
+      <div>
+        <h1>Task Dashboard</h1>
+        <p class="ph-sub">Plan today / Achieve tomorrow</p>
+      </div>
+      <div class="crumbs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>
+        <span>/</span>
+        <span id="userEmail" class="user-email-text">Loading user...</span>
+      </div>
+    </section>
+
+    <!-- Live status: connection, sync, reminders -->
+    <div id="statusBanner" class="notify-banner flex flex-wrap items-center gap-x-4 gap-y-1" role="status" aria-live="polite"></div>
+
+    <!-- Stat Bar -->
+    <section class="stats-grid" aria-label="Task summary">
+      <div class="stat-card">
+        <h3>Pending Tasks</h3>
+        <p id="pendingCount">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Completed Tasks</h3>
+        <p id="completedCount">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Due in 48 Hours</h3>
+        <p id="upcomingCount">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Overdue</h3>
+        <p id="overdueCount">0</p>
+      </div>
+    </section>
+
+    <!-- Progress -->
+    <section class="panel-card progress-card" aria-label="Progress">
+      <div class="progress-top">
+        <span id="progressLabel"><strong>0%</strong> of tasks completed</span>
+        <span id="workloadLabel">Planned workload: none</span>
+      </div>
+      <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </section>
+
+    <!-- Main Grid: Left Task Management, Right FullCalendar -->
+    <main class="dashboard-grid">
+      <!-- Left Panel: Quick Add & Task List -->
+      <section class="panel-card">
+        <h2 class="panel-title">Quick Add Task</h2>
+        <form id="taskForm" class="task-form" autocomplete="off">
+          <div class="quick-row">
+            <input type="text" id="taskTitle" placeholder="Task title, press Enter" maxlength="200" required />
+            <button type="submit">Add</button>
+          </div>
+
+          <details class="more" id="moreDetails">
+            <summary>Add details (deadline, priority, time estimate)</summary>
+            <div class="more-fields">
+              <div>
+                <label class="field-label" for="taskDueDate">Deadline</label>
+                <input type="datetime-local" id="taskDueDate" />
+                <p class="hint">Leave empty and it is due tomorrow at 11:59 PM.</p>
+              </div>
+              <div>
+                <label class="field-label" for="taskCategory">Category</label>
+                <select id="taskCategory">
+                    <option value="Assignment" selected>Assignment</option>
+                    <option value="Project">Project</option>
+                    <option value="Presentation">Presentation</option>
+                    <option value="Exam / Quiz">Exam / Quiz</option>
+                    <option value="Reading">Reading</option>
+                    <option value="Report / Paper">Report / Paper</option>
+                    <option value="Group Work">Group Work</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="two-col">
+                <div>
+                  <label class="field-label" for="taskPriority">Priority</label>
+                  <select id="taskPriority">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label" for="taskEstimate">Time needed (minutes)</label>
+                  <input type="number" id="taskEstimate" min="5" max="1440" step="5" placeholder="e.g. 90" />
+                </div>
+              </div>
+              <div>
+                <label class="field-label" for="taskDescription">Description</label>
+                <textarea id="taskDescription" maxlength="1000" placeholder="Notes, subject, requirements…"></textarea>
+              </div>
+              <label class="checkbox-row"><input type="checkbox" id="sendEmailCheckbox" /> Email me a copy of this task</label>
+            </div>
+          </details>
+        </form>
+
+        <h2 class="panel-title">Your Task List</h2>
+        <div class="toolbar">
+          <select id="sortSelect" aria-label="Sort tasks">
+            <option value="smart">Smart sort</option>
+            <option value="deadline">By deadline</option>
+            <option value="priority">By priority</option>
+          </select>
+          <select id="categoryFilter" aria-label="Filter by category">
+            <option value="all">All categories</option>
+                    <option value="Assignment">Assignment</option>
+                    <option value="Project">Project</option>
+                    <option value="Presentation">Presentation</option>
+                    <option value="Exam / Quiz">Exam / Quiz</option>
+                    <option value="Reading">Reading</option>
+                    <option value="Report / Paper">Report / Paper</option>
+                    <option value="Group Work">Group Work</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Other">Other</option>
+          </select>
+          <select id="filterSelect" aria-label="Filter tasks">
+            <option value="all">All tasks</option>
+            <option value="pending">Pending</option>
+            <option value="overdue">Overdue</option>
+            <option value="done">Completed</option>
+          </select>
+        </div>
+        <ul id="taskList" class="task-ul"></ul>
+      </section>
+
+      <!-- Right Panel: FullCalendar Visual Schedule -->
+      <section class="panel-card">
+        <h2 class="panel-title">Visual Schedule Calendar</h2>
+        <div id="calendar"></div>
+        <p class="hint" style="margin-top: 12px;">Tap a task to edit it. Tap a day to start a task for that date. A task with a time estimate shows as a block that ends at its deadline.</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- Edit task -->
+  <dialog id="editDialog" class="modal" aria-labelledby="editHeading">
+    <form id="editForm" class="modal-form" method="dialog">
+      <h2 id="editHeading">Edit task</h2>
+      <div>
+        <label class="field-label" for="editTitle">Title</label>
+        <input type="text" id="editTitle" maxlength="200" required />
+      </div>
+      <div>
+        <label class="field-label" for="editDescription">Description</label>
+        <textarea id="editDescription" maxlength="1000"></textarea>
+      </div>
+      <div>
+        <label class="field-label" for="editCategory">Category</label>
+        <select id="editCategory">
+          <option value="">No category</option>
+                    <option value="Assignment">Assignment</option>
+                    <option value="Project">Project</option>
+                    <option value="Presentation">Presentation</option>
+                    <option value="Exam / Quiz">Exam / Quiz</option>
+                    <option value="Reading">Reading</option>
+                    <option value="Report / Paper">Report / Paper</option>
+                    <option value="Group Work">Group Work</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="two-col">
+        <div>
+          <label class="field-label" for="editPriority">Priority</label>
+          <select id="editPriority">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label" for="editEstimate">Time needed (minutes)</label>
+          <input type="number" id="editEstimate" min="5" max="1440" step="5" placeholder="e.g. 90" />
+        </div>
+      </div>
+      <div>
+        <label class="field-label" for="editDue">Deadline</label>
+        <input type="datetime-local" id="editDue" required />
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-danger spacer" id="editDelete">Delete</button>
+        <button type="button" class="btn btn-secondary" id="editCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Reminder settings -->
+  <dialog id="settingsDialog" class="modal" aria-labelledby="settingsHeading">
+    <form id="settingsForm" class="modal-form" method="dialog">
+      <h2 id="settingsHeading">Reminder settings</h2>
+      <label class="checkbox-row"><input type="checkbox" id="setEmail" /> Send reminders by email</label>
+      <label class="checkbox-row"><input type="checkbox" id="setBrowser" /> Show alerts on this device</label>
+
+      <div>
+        <label class="field-label" for="setIntensity">How often should I remind you?</label>
+        <select id="setIntensity">
+          <option value="off">Off: no reminders</option>
+          <option value="gentle">Gentle: day before, morning of, and at the deadline</option>
+          <option value="normal">Normal: daily for 3 days, then closer to the deadline</option>
+          <option value="persistent">Persistent: daily for 5 days, then more often</option>
+        </select>
+        <p class="hint" id="intensityHint"></p>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <label class="field-label" for="setDailyHour">Daily reminder time</label>
+          <select id="setDailyHour"></select>
+        </div>
+        <div>
+          <label class="field-label" for="setTimezone">Time zone</label>
+          <input type="text" id="setTimezone" readonly />
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <label class="field-label" for="setQuietStart">Quiet hours start</label>
+          <select id="setQuietStart"></select>
+        </div>
+        <div>
+          <label class="field-label" for="setQuietEnd">Quiet hours end</label>
+          <select id="setQuietEnd"></select>
+        </div>
+      </div>
+      <p class="hint">No reminders during quiet hours, except "due now" and the final 10-minute alert. High priority tasks get the full schedule, Medium skips some steps, and Low gets only the day before, the morning, and the deadline. Email reminders work even when the app is closed. Device alerts show while SimpleTask is open or installed.</p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="settingsCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save settings</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- External JS CDNs -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="pwa.js"></script>
+  <script src="reminder-schedule.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
