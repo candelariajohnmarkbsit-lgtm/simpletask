@@ -466,18 +466,6 @@
       nowIndicator: true,
       headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,listWeek' },
       events: [],
-      eventTimeFormat: {
-        hour: 'numeric',
-        minute: '2-digit',
-        meridiem: 'short',
-        hour12: true
-      },
-      slotLabelFormat: {
-        hour: 'numeric',
-        minute: '2-digit',
-        meridiem: 'short',
-        hour12: true
-      },
       eventClick: (info) => openEdit(info.event.id),
       dateClick: (info) => {
         const d = new Date(info.date);
@@ -497,9 +485,17 @@
       const mins = t.estimated_minutes;
       const done = t.is_completed;
       const color = done ? '#5d656d' : (PRIORITY_COLOR[t.priority] || '#f97316');
+
+      // Standard formatted time (e.g., "4:31 PM") without clipping the 'm'
+      const timeStr = due.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+
       const ev = {
         id: String(t.id),
-        title: t.title,
+        title: `${timeStr} - ${t.title}`, // Cleans up the calendar event box title
         start: mins ? new Date(due.getTime() - mins * 60000) : due,
         backgroundColor: color,
         borderColor: 'transparent',
