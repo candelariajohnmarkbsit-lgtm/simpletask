@@ -340,7 +340,7 @@
   }
 
   /* ------------------------------------------------------------------
-     Rendering
+      Rendering
      ------------------------------------------------------------------ */
   function compareTasks(a, b) {
     if (a.is_completed !== b.is_completed) return a.is_completed ? 1 : -1;
@@ -466,6 +466,18 @@
       nowIndicator: true,
       headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,listWeek' },
       events: [],
+      eventTimeFormat: {
+        hour: 'numeric',
+        minute: '2-digit',
+        meridiem: 'short',
+        hour12: true
+      },
+      slotLabelFormat: {
+        hour: 'numeric',
+        minute: '2-digit',
+        meridiem: 'short',
+        hour12: true
+      },
       eventClick: (info) => openEdit(info.event.id),
       dateClick: (info) => {
         const d = new Date(info.date);
@@ -509,7 +521,7 @@
   }
 
   /* ------------------------------------------------------------------
-     Dialogs and forms
+      Dialogs and forms
      ------------------------------------------------------------------ */
   function openEdit(id) {
     const t = tasks.find((x) => String(x.id) === String(id));
@@ -694,7 +706,7 @@
   }
 
   /* ------------------------------------------------------------------
-     Start-up
+      Start-up
      ------------------------------------------------------------------ */
   async function init() {
     let user = null;
